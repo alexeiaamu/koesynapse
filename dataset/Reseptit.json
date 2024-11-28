@@ -1,0 +1,28 @@
+{
+	"name": "Reseptit",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "pyrysynapsi-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"tiedostonimi": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().tiedostonimi",
+					"type": "Expression"
+				},
+				"fileSystem": "reseptit"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

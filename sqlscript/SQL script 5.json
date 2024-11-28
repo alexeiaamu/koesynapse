@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 5",
+	"properties": {
+		"content": {
+			"query": "ALTER TABLE Lennot\nALTER COLUMN aircraft_code VARCHAR(222);\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "Uima_allas",
+				"poolName": "Uima_allas"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

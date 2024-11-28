@@ -1,0 +1,48 @@
+{
+	"name": "tuokentat",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Lentodata",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzurePostgreSqlTable",
+		"schema": [
+			{
+				"name": "airport_code",
+				"type": "character",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "airport_name",
+				"type": "jsonb",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "city",
+				"type": "jsonb",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "coordinates",
+				"type": "point",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "timezone",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": "bookings",
+			"table": "airports_data"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

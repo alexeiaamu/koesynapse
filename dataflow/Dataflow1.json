@@ -1,0 +1,75 @@
+{
+	"name": "Dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "titaanikki",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSynapseAnalyticsTable1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1",
+					"rejectedDataLinkedService": {
+						"referenceName": "pyrysynapsi-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					}
+				}
+			],
+			"transformations": [
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Prop_0 as string,",
+				"          Survived as string,",
+				"          Pclass as string,",
+				"          Name as string,",
+				"          Sex as string,",
+				"          Age as string,",
+				"          {Siblings/Spouses Aboard} as string,",
+				"          {Parents/Children Aboard} as string,",
+				"          Fare as string,",
+				"          highFare as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 select(mapColumn(",
+				"          Survived,",
+				"          Pclass,",
+				"          Name,",
+				"          Sex,",
+				"          Age,",
+				"          SiblingsSpousesAboard = {Siblings/Spouses Aboard},",
+				"          ParentsChildrenAboard = {Parents/Children Aboard},",
+				"          Fare,",
+				"          highFare",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     staged: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     store: 'synapse') ~> sink1"
+			]
+		}
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 4",
+	"properties": {
+		"content": {
+			"query": "\nSELECT \n    f.flight_id,\n    f.flight_no,\n    f.scheduled_departure,\n    f.scheduled_arrival,\n    f.departure_airport,\n    f.arrival_airport,\n    f.status,\n    a.aircraft_code\nINTO final_flights_data\nFROM \n    Lennot f\nJOIN \n    Kentat airport_code ON f.departure_airport = airport_code\n\nJOIN \n    Koneet a ON f.aircraft_code = a.aircraft_code;\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "Uima_allas",
+				"poolName": "Uima_allas"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

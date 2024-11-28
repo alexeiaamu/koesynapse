@@ -1,0 +1,38 @@
+{
+	"name": "Parquet1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "pyrysynapsi-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"select_file": {
+				"type": "string",
+				"defaultValue": "1"
+			},
+			"ota_arvo": {
+				"type": "String",
+				"defaultValue": "flights.parquet"
+			},
+			"kone": {
+				"type": "String",
+				"defaultValue": "aircrafts_data.parquet"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().ota_arvo",
+					"type": "Expression"
+				},
+				"fileSystem": "lentodata"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

@@ -1,0 +1,33 @@
+{
+	"name": "koedata",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Pyryjarvi",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"tiedostonimi": {
+				"type": "String",
+				"defaultValue": "1"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().tiedostonimi",
+					"type": "Expression"
+				},
+				"fileSystem": "koedata"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

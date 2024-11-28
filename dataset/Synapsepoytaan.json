@@ -1,0 +1,17 @@
+{
+	"name": "Synapsepoytaan",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "pyrysynapsi-WorkspaceDefaultSqlServer",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "titanik"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

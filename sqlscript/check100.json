@@ -1,0 +1,17 @@
+{
+	"name": "check100",
+	"properties": {
+		"content": {
+			"query": "SELECT TOP (100) [Survived]\n,[Pclass]\n,[Name]\n,[Sex]\n,[Age]\n,[SiblingsSpousesAboard]\n,[ParentsChildrenAboard]\n,[Fare]\n,[highFare]\n FROM [default].[dbo].[survivors]",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "default",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

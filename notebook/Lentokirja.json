@@ -1,0 +1,95 @@
+{
+	"name": "Lentokirja",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "pyrykipina",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "bd875a85-7f7b-4933-863e-569e527243c2"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1"
+			},
+			"enableDebugMode": false,
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/23b183d5-a30f-46b8-b418-ad060fb67787/resourceGroups/pyry_resource/providers/Microsoft.Synapse/workspaces/pyrysynapsi/bigDataPools/pyrykipina",
+				"name": "pyrykipina",
+				"type": "Spark",
+				"endpoint": "https://pyrysynapsi.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/pyrykipina",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"print('Kikkeliskokkelis')"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Load the raw data from Data Lake (e.g., Parquet files)\r\n",
+					"bookings_df = spark.read.parquet(\"adl://yourdatalake.dfs.core.windows.net/rawdata/bookings.parquet\")\r\n",
+					"flights_df = spark.read.parquet(\"adl://yourdatalake.dfs.core.windows.net/rawdata/flights.parquet\")\r\n",
+					"airports_df = spark.read.parquet(\"adl://yourdatalake.dfs.core.windows.net/rawdata/airports.parquet\")\r\n",
+					"aircrafts_df = spark.read.parquet(\"adl://yourdatalake.dfs.core.windows.net/rawdata/aircrafts.parquet\")\r\n",
+					"passengers_df = spark.read.parquet(\"adl://yourdatalake.dfs.core.windows.net/rawdata/passengers.parquet\")\r\n",
+					"\r\n",
+					"# Join tables to create fact table\r\n",
+					"fact_bookings_df = bookings_df.join(flights_df, \"FlightID\").join(airports_df, \"AirportID\").join(aircrafts_df, \"AircraftID\").join(passengers_df, \"PassengerID\")\r\n",
+					"\r\n",
+					"# Transform columns into fact and dimension tables\r\n",
+					"fact_bookings_transformed_df = fact_bookings_df.select(\"BookingID\", \"FlightID\", \"PassengerID\", \"AircraftID\", \"DepartureTime\", \"ArrivalTime\", \"SeatCount\", \"TotalFare\", \"Distance\")\r\n",
+					"\r\n",
+					"dim_airports_df = airports_df.select(\"AirportID\", \"AirportCode\", \"AirportName\", \"City\", \"Country\")\r\n",
+					"dim_aircrafts_df = aircrafts_df.select(\"AircraftID\", \"AircraftType\", \"AircraftModel\")\r\n",
+					"dim_flights_df = flights_df.select(\"FlightID\", \"FlightNumber\", \"DepartureAirportID\", \"ArrivalAirportID\", \"FlightDate\", \"FlightDuration\")\r\n",
+					"dim_passengers_df = passengers_df.select(\"PassengerID\", \"FirstName\", \"LastName\", \"Email\")\r\n",
+					""
+				]
+			}
+		]
+	}
+}

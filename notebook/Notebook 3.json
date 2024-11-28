@@ -1,0 +1,63 @@
+{
+	"name": "Notebook 3",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "pyrykipina",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "a6bb5c9f-47fd-481a-a3f7-b9f189decc2b"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1"
+			},
+			"enableDebugMode": false,
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/23b183d5-a30f-46b8-b418-ad060fb67787/resourceGroups/pyry_resource/providers/Microsoft.Synapse/workspaces/pyrysynapsi/bigDataPools/pyrykipina",
+				"name": "pyrykipina",
+				"type": "Spark",
+				"endpoint": "https://pyrysynapsi.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/pyrykipina",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"jdbc_url = \"jdbc:sqlserver://Uima_allas.database.windows.net:1433;database=dbo;\"\r\n",
+					"spark_read = spark.read.jdbc(url=jdbc_url, table='survivors')\r\n",
+					"spark_read.show(5, truncate=False)"
+				],
+				"execution_count": 7
+			}
+		]
+	}
+}

@@ -1,0 +1,36 @@
+{
+	"name": "Tuo_koneet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Lentodata",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzurePostgreSqlTable",
+		"schema": [
+			{
+				"name": "aircraft_code",
+				"type": "character",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "model",
+				"type": "jsonb",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "range",
+				"type": "integer",
+				"precision": 0,
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": "bookings",
+			"table": "aircrafts_data"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}
