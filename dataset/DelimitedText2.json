@@ -2,15 +2,15 @@
 	"name": "DelimitedText2",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureBlobStorage1",
+			"referenceName": "Pyryjarvi",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobStorageLocation",
-				"container": "titanix"
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "titanix"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
