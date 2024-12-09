@@ -1,0 +1,91 @@
+{
+	"name": "Dataflow2",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "titaanikki",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"name": "sink1"
+				},
+				{
+					"name": "sink2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "assert1"
+				},
+				{
+					"name": "split1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "select2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Prop_0 as string,",
+				"          Survived as string,",
+				"          Pclass as string,",
+				"          Name as string,",
+				"          Sex as string,",
+				"          Age as string,",
+				"          {Siblings/Spouses Aboard} as string,",
+				"          {Parents/Children Aboard} as string,",
+				"          Fare as float,",
+				"          highFare as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 assert(expectUnique(Name, false, 'assert1'),",
+				"     expectTrue(Fare > 0.0, false, 'assert2')) ~> assert1",
+				"assert1 split(isError(),",
+				"     disjoint: false) ~> split1@(Fail, Success)",
+				"split1@Fail select(mapColumn(",
+				"          Survived,",
+				"          Pclass,",
+				"          Name,",
+				"          Sex,",
+				"          Age,",
+				"          Fare",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"split1@Success select(mapColumn(",
+				"          Survived,",
+				"          Pclass,",
+				"          Name,",
+				"          Sex,",
+				"          Age,",
+				"          {Siblings/SpousesAboard} = {Siblings/Spouses Aboard},",
+				"          {Parents/ChildrenAboard} = {Parents/Children Aboard},",
+				"          Fare,",
+				"          highFare",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1",
+				"select2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink2"
+			]
+		}
+	}
+}
