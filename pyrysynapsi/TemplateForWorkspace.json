@@ -1,0 +1,2764 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"type": "string",
+			"metadata": "Workspace name",
+			"defaultValue": "pyrysynapsi"
+		},
+		"Lentodata_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Lentodata'"
+		},
+		"Pyryjarvi_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'Pyryjarvi'"
+		},
+		"lennotserveri_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'lennotserveri'"
+		},
+		"pyrysynapsi-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'pyrysynapsi-WorkspaceDefaultSqlServer'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:pyrysynapsi.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"AzureBlobStorage1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
+		},
+		"Httptitanic_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://web.stanford.edu/class/archive/cs/cs109/cs109.1166/stuff/titanic.csv"
+		},
+		"Pyryjarvi_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://pyryjarvi.dfs.core.windows.net/"
+		},
+		"Restepti1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://dummyjson.com/recipes/"
+		},
+		"Uima_allas_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "pyrysynapsi.sql.azuresynapse.net"
+		},
+		"Uima_allas_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "Uima_allas"
+		},
+		"pyrysynapsi-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://pyryjarvi.dfs.core.windows.net"
+		}
+	},
+	"variables": {
+		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/ETL1')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Tuo lennot",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							},
+							"sink": {
+								"type": "SqlPoolSink",
+								"allowCopyCommand": true,
+								"copyCommandSettings": {},
+								"tableOption": "autoCreate"
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "Parquet1",
+								"type": "DatasetReference",
+								"parameters": {
+									"ota_arvo": "flights.parquet"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Uima_allas",
+								"type": "DatasetReference",
+								"parameters": {
+									"Create_table": "Lennot"
+								}
+							}
+						]
+					},
+					{
+						"name": "Tuo koneet",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							},
+							"sink": {
+								"type": "SqlPoolSink",
+								"allowCopyCommand": true,
+								"copyCommandSettings": {},
+								"tableOption": "autoCreate"
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "Parquet1",
+								"type": "DatasetReference",
+								"parameters": {
+									"kone": "aircrafts_data.parquet"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Uima_allas",
+								"type": "DatasetReference",
+								"parameters": {
+									"Create_table": "Koneet"
+								}
+							}
+						]
+					},
+					{
+						"name": "Tuo kentat",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							},
+							"sink": {
+								"type": "SqlPoolSink",
+								"allowCopyCommand": true,
+								"copyCommandSettings": {},
+								"tableOption": "autoCreate"
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "Parquet1",
+								"type": "DatasetReference",
+								"parameters": {
+									"ota_arvo": "airports_data.parquet"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Uima_allas",
+								"type": "DatasetReference",
+								"parameters": {
+									"Create_table": "Kentat"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-28T09:19:42Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/Parquet1')]",
+				"[concat(variables('workspaceId'), '/datasets/Uima_allas')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Koeputki')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get lennot",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzurePostgreSqlSource",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "tuolennot",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "koedata",
+								"type": "DatasetReference",
+								"parameters": {
+									"tiedostonimi": "lennot"
+								}
+							}
+						]
+					},
+					{
+						"name": "Get liput",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzurePostgreSqlSource",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "tuoliput",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "koedata",
+								"type": "DatasetReference",
+								"parameters": {
+									"tiedostonimi": "liput"
+								}
+							}
+						]
+					},
+					{
+						"name": "Join lennotliput",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Get lennot",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Get liput",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Koeflow",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"liput": {
+										"mikadata": "liput"
+									},
+									"lennot": {},
+									"sink1": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "pyrysynapsi-WorkspaceDefaultStorage",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "koedata"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-28T14:34:10Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/tuolennot')]",
+				"[concat(variables('workspaceId'), '/datasets/koedata')]",
+				"[concat(variables('workspaceId'), '/datasets/tuoliput')]",
+				"[concat(variables('workspaceId'), '/dataflows/Koeflow')]",
+				"[concat(variables('workspaceId'), '/linkedServices/pyrysynapsi-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Titanicex2')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get titanic",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DelimitedText1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Datalakemain",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Titaniktitaanikkiin",
+						"type": "SynapseNotebook",
+						"dependsOn": [
+							{
+								"activity": "Get titanic",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "Notebook 2",
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "pyrykipina",
+								"type": "BigDataPoolReference"
+							},
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"numExecutors": null
+						}
+					},
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Titaniktitaanikkiin",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Dataflow1",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "pyrysynapsi-WorkspaceDefaultStorage",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "ex2"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-27T13:09:31Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/DelimitedText1')]",
+				"[concat(variables('workspaceId'), '/datasets/Datalakemain')]",
+				"[concat(variables('workspaceId'), '/notebooks/Notebook 2')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/pyrykipina')]",
+				"[concat(variables('workspaceId'), '/dataflows/Dataflow1')]",
+				"[concat(variables('workspaceId'), '/linkedServices/pyrysynapsi-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/reseptit')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "resepti1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "RestResource1",
+								"type": "DatasetReference",
+								"parameters": {
+									"reseptinro": "50"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Reseptit",
+								"type": "DatasetReference",
+								"parameters": {
+									"tiedostonimi": "resepti1.json"
+								}
+							}
+						]
+					},
+					{
+						"name": "resepti2",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "RestResource1",
+								"type": "DatasetReference",
+								"parameters": {
+									"reseptinro": "49"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Reseptit",
+								"type": "DatasetReference",
+								"parameters": {
+									"tiedostonimi": "resepti2.json"
+								}
+							}
+						]
+					},
+					{
+						"name": "resepti3",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "RestResource1",
+								"type": "DatasetReference",
+								"parameters": {
+									"reseptinro": "48"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Reseptit",
+								"type": "DatasetReference",
+								"parameters": {
+									"tiedostonimi": "resepti3.json"
+								}
+							}
+						]
+					},
+					{
+						"name": "resepti4",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "RestResource1",
+								"type": "DatasetReference",
+								"parameters": {
+									"reseptinro": "47"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Reseptit",
+								"type": "DatasetReference",
+								"parameters": {
+									"tiedostonimi": "resepti4.json"
+								}
+							}
+						]
+					},
+					{
+						"name": "resepti5",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "RestResource1",
+								"type": "DatasetReference",
+								"parameters": {
+									"reseptinro": "46"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Reseptit",
+								"type": "DatasetReference",
+								"parameters": {
+									"tiedostonimi": "resepti5.json"
+								}
+							}
+						]
+					},
+					{
+						"name": "Reseptivihko",
+						"type": "SynapseNotebook",
+						"dependsOn": [
+							{
+								"activity": "resepti1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "resepti2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "resepti3",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "resepti4",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "resepti5",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "reseptivihko",
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "pyrykipina",
+								"type": "BigDataPoolReference"
+							},
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"numExecutors": null
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-27T14:13:29Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/RestResource1')]",
+				"[concat(variables('workspaceId'), '/datasets/Reseptit')]",
+				"[concat(variables('workspaceId'), '/notebooks/reseptivihko')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/pyrykipina')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureSynapseAnalyticsTable1')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Uima_allas",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "koetaulu"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Uima_allas')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Datalakemain')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "pyrysynapsi-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "titanik.csv",
+						"fileSystem": "ex2"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/pyrysynapsi-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DelimitedText1')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Httptitanic",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Httptitanic')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Parquet1')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "pyrysynapsi-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"select_file": {
+						"type": "string",
+						"defaultValue": "1"
+					},
+					"ota_arvo": {
+						"type": "String",
+						"defaultValue": "flights.parquet"
+					},
+					"kone": {
+						"type": "String",
+						"defaultValue": "aircrafts_data.parquet"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().ota_arvo",
+							"type": "Expression"
+						},
+						"fileSystem": "lentodata"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/pyrysynapsi-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Reseptit')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "pyrysynapsi-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"tiedostonimi": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().tiedostonimi",
+							"type": "Expression"
+						},
+						"fileSystem": "reseptit"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/pyrysynapsi-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/RestResource1')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Restepti1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"reseptinro": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": {
+						"value": "@dataset().reseptinro",
+						"type": "Expression"
+					}
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Restepti1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Synapsepoytaan')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "pyrysynapsi-WorkspaceDefaultSqlServer",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "titanik"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/pyrysynapsi-WorkspaceDefaultSqlServer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Tuo_koneet')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Lentodata",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "aircraft_code",
+						"type": "character",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "model",
+						"type": "jsonb",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "range",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "bookings",
+					"table": "aircrafts_data"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Lentodata')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Uima_allas')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"Create_table": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "SqlPoolTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().Create_table",
+						"type": "Expression"
+					}
+				},
+				"sqlPool": {
+					"referenceName": "Uima_allas",
+					"type": "SqlPoolReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/sqlPools/Uima_allas')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/koedata')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Pyryjarvi",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"tiedostonimi": {
+						"type": "String",
+						"defaultValue": "1"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().tiedostonimi",
+							"type": "Expression"
+						},
+						"fileSystem": "koedata"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Pyryjarvi')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/lennotflow')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Pyryjarvi",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "lennot",
+						"fileSystem": "koedata"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "flight_id",
+						"type": "String"
+					},
+					{
+						"name": "flight_no",
+						"type": "String"
+					},
+					{
+						"name": "scheduled_departure",
+						"type": "String"
+					},
+					{
+						"name": "scheduled_arrival",
+						"type": "String"
+					},
+					{
+						"name": "departure_airport",
+						"type": "String"
+					},
+					{
+						"name": "arrival_airport",
+						"type": "String"
+					},
+					{
+						"name": "status",
+						"type": "String"
+					},
+					{
+						"name": "aircraft_code",
+						"type": "String"
+					},
+					{
+						"name": "actual_departure",
+						"type": "String"
+					},
+					{
+						"name": "actual_arrival",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Pyryjarvi')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/lennotparketti')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "pyrysynapsi-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "lentodata"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/pyrysynapsi-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/liputflow')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Pyryjarvi",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"mikadata": {
+						"type": "String",
+						"defaultValue": "1"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "liput",
+						"fileSystem": "koedata"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Pyryjarvi')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/titaanikki')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "pyrysynapsi-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "titaanikki.csv",
+						"fileSystem": "ex2"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Prop_0",
+						"type": "String"
+					},
+					{
+						"name": "Survived",
+						"type": "String"
+					},
+					{
+						"name": "Pclass",
+						"type": "String"
+					},
+					{
+						"name": "Name",
+						"type": "String"
+					},
+					{
+						"name": "Sex",
+						"type": "String"
+					},
+					{
+						"name": "Age",
+						"type": "String"
+					},
+					{
+						"name": "Siblings/Spouses Aboard",
+						"type": "String"
+					},
+					{
+						"name": "Parents/Children Aboard",
+						"type": "String"
+					},
+					{
+						"name": "Fare",
+						"type": "String"
+					},
+					{
+						"name": "highFare",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/pyrysynapsi-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/tuokentat')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Lentodata",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "airport_code",
+						"type": "character",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "airport_name",
+						"type": "jsonb",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "city",
+						"type": "jsonb",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "coordinates",
+						"type": "point",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "timezone",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "bookings",
+					"table": "airports_data"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Lentodata')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/tuolennot')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Lentodata",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "flight_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "flight_no",
+						"type": "character",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "scheduled_departure",
+						"type": "timestamp with time zone",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "scheduled_arrival",
+						"type": "timestamp with time zone",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "departure_airport",
+						"type": "character",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "arrival_airport",
+						"type": "character",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "status",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "aircraft_code",
+						"type": "character",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "actual_departure",
+						"type": "timestamp with time zone",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "actual_arrival",
+						"type": "timestamp with time zone",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "bookings",
+					"table": "flights"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Lentodata')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/tuoliput')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Lentodata",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "ticket_no",
+						"type": "character",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "flight_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "fare_conditions",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "amount",
+						"type": "numeric",
+						"precision": 10,
+						"scale": 2
+					}
+				],
+				"typeProperties": {
+					"schema": "bookings",
+					"table": "ticket_flights"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Lentodata')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Httptitanic')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('Httptitanic_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Lentodata')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzurePostgreSql",
+				"typeProperties": {
+					"connectionString": "[parameters('Lentodata_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Pyryjarvi')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('Pyryjarvi_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('Pyryjarvi_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Restepti1')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"reseptinro": {
+						"type": "string",
+						"defaultValue": "1"
+					}
+				},
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('Restepti1_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Uima_allas')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"server": "[parameters('Uima_allas_properties_typeProperties_server')]",
+					"database": "[parameters('Uima_allas_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": true,
+					"authenticationType": "SystemAssignedManagedIdentity"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/lennotserveri')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzurePostgreSql",
+				"typeProperties": {
+					"connectionString": "[parameters('lennotserveri_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/pyrysynapsi-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('pyrysynapsi-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/pyrysynapsi-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('pyrysynapsi-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Dataflow1')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "titaanikki",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsTable1",
+								"type": "DatasetReference"
+							},
+							"name": "sink1",
+							"rejectedDataLinkedService": {
+								"referenceName": "pyrysynapsi-WorkspaceDefaultStorage",
+								"type": "LinkedServiceReference"
+							}
+						}
+					],
+					"transformations": [
+						{
+							"name": "select1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Prop_0 as string,",
+						"          Survived as string,",
+						"          Pclass as string,",
+						"          Name as string,",
+						"          Sex as string,",
+						"          Age as string,",
+						"          {Siblings/Spouses Aboard} as string,",
+						"          {Parents/Children Aboard} as string,",
+						"          Fare as string,",
+						"          highFare as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"source1 select(mapColumn(",
+						"          Survived,",
+						"          Pclass,",
+						"          Name,",
+						"          Sex,",
+						"          Age,",
+						"          SiblingsSpousesAboard = {Siblings/Spouses Aboard},",
+						"          ParentsChildrenAboard = {Parents/Children Aboard},",
+						"          Fare,",
+						"          highFare",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     staged: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     store: 'synapse') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/titaanikki')]",
+				"[concat(variables('workspaceId'), '/datasets/AzureSynapseAnalyticsTable1')]",
+				"[concat(variables('workspaceId'), '/linkedServices/pyrysynapsi-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Koeflow')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "liputflow",
+								"type": "DatasetReference"
+							},
+							"name": "liput"
+						},
+						{
+							"dataset": {
+								"referenceName": "lennotflow",
+								"type": "DatasetReference"
+							},
+							"name": "lennot"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsTable1",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "join1"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "filter1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          ticket_no as long,",
+						"          flight_id as integer,",
+						"          fare_conditions as string,",
+						"          amount as double",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> liput",
+						"source(output(",
+						"          flight_id as integer,",
+						"          flight_no as string,",
+						"          scheduled_departure as string,",
+						"          scheduled_arrival as string,",
+						"          departure_airport as string,",
+						"          arrival_airport as string,",
+						"          status as string,",
+						"          aircraft_code as string,",
+						"          actual_departure as string,",
+						"          actual_arrival as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> lennot",
+						"liput, lennot join(liput@flight_id == lennot@flight_id,",
+						"     joinType:'outer',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"join1 select(mapColumn(",
+						"          ticket_no,",
+						"          flight_id = liput@flight_id,",
+						"          fare_conditions,",
+						"          amount,",
+						"          flight_no,",
+						"          scheduled_departure,",
+						"          scheduled_arrival,",
+						"          departure_airport,",
+						"          arrival_airport,",
+						"          status,",
+						"          aircraft_code,",
+						"          actual_departure,",
+						"          actual_arrival",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 filter(!isNull(amount)) ~> filter1",
+						"filter1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     staged: true,",
+						"     allowCopyCommand: true,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/liputflow')]",
+				"[concat(variables('workspaceId'), '/datasets/lennotflow')]",
+				"[concat(variables('workspaceId'), '/datasets/AzureSynapseAnalyticsTable1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
+			"type": "Microsoft.Synapse/workspaces/credentials",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 4')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "\nSELECT \n    f.flight_id,\n    f.flight_no,\n    f.scheduled_departure,\n    f.scheduled_arrival,\n    f.departure_airport,\n    f.arrival_airport,\n    f.status,\n    a.aircraft_code\nINTO final_flights_data\nFROM \n    Lennot f\nJOIN \n    Kentat airport_code ON f.departure_airport = airport_code\n\nJOIN \n    Koneet a ON f.aircraft_code = a.aircraft_code;\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "Uima_allas",
+						"poolName": "Uima_allas"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 5')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "ALTER TABLE Lennot\nALTER COLUMN aircraft_code VARCHAR(222);\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "Uima_allas",
+						"poolName": "Uima_allas"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/check100')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT TOP (100) [Survived]\n,[Pclass]\n,[Name]\n,[Sex]\n,[Age]\n,[SiblingsSpousesAboard]\n,[ParentsChildrenAboard]\n,[Fare]\n,[highFare]\n FROM [default].[dbo].[survivors]",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "default",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Lentokirja')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "pyrykipina",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "bd875a85-7f7b-4933-863e-569e527243c2"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/23b183d5-a30f-46b8-b418-ad060fb67787/resourceGroups/pyry_resource/providers/Microsoft.Synapse/workspaces/pyrysynapsi/bigDataPools/pyrykipina",
+						"name": "pyrykipina",
+						"type": "Spark",
+						"endpoint": "https://pyrysynapsi.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/pyrykipina",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"print('Kikkeliskokkelis')"
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Load the raw data from Data Lake (e.g., Parquet files)\r\n",
+							"bookings_df = spark.read.parquet(\"adl://yourdatalake.dfs.core.windows.net/rawdata/bookings.parquet\")\r\n",
+							"flights_df = spark.read.parquet(\"adl://yourdatalake.dfs.core.windows.net/rawdata/flights.parquet\")\r\n",
+							"airports_df = spark.read.parquet(\"adl://yourdatalake.dfs.core.windows.net/rawdata/airports.parquet\")\r\n",
+							"aircrafts_df = spark.read.parquet(\"adl://yourdatalake.dfs.core.windows.net/rawdata/aircrafts.parquet\")\r\n",
+							"passengers_df = spark.read.parquet(\"adl://yourdatalake.dfs.core.windows.net/rawdata/passengers.parquet\")\r\n",
+							"\r\n",
+							"# Join tables to create fact table\r\n",
+							"fact_bookings_df = bookings_df.join(flights_df, \"FlightID\").join(airports_df, \"AirportID\").join(aircrafts_df, \"AircraftID\").join(passengers_df, \"PassengerID\")\r\n",
+							"\r\n",
+							"# Transform columns into fact and dimension tables\r\n",
+							"fact_bookings_transformed_df = fact_bookings_df.select(\"BookingID\", \"FlightID\", \"PassengerID\", \"AircraftID\", \"DepartureTime\", \"ArrivalTime\", \"SeatCount\", \"TotalFare\", \"Distance\")\r\n",
+							"\r\n",
+							"dim_airports_df = airports_df.select(\"AirportID\", \"AirportCode\", \"AirportName\", \"City\", \"Country\")\r\n",
+							"dim_aircrafts_df = aircrafts_df.select(\"AircraftID\", \"AircraftType\", \"AircraftModel\")\r\n",
+							"dim_flights_df = flights_df.select(\"FlightID\", \"FlightNumber\", \"DepartureAirportID\", \"ArrivalAirportID\", \"FlightDate\", \"FlightDuration\")\r\n",
+							"dim_passengers_df = passengers_df.select(\"PassengerID\", \"FirstName\", \"LastName\", \"Email\")\r\n",
+							""
+						],
+						"outputs": []
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Notebook 2')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "pyrykipina",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "8759bc64-51f1-4236-8eed-46365fd57462"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/23b183d5-a30f-46b8-b418-ad060fb67787/resourceGroups/pyry_resource/providers/Microsoft.Synapse/workspaces/pyrysynapsi/bigDataPools/pyrykipina",
+						"name": "pyrykipina",
+						"type": "Spark",
+						"endpoint": "https://pyrysynapsi.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/pyrykipina",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Read data file from FSSPEC short URL of default Azure Data Lake Storage Gen2\r\n",
+							"\r\n",
+							"import pandas as pd\r\n",
+							"\r\n",
+							"#read csv file\r\n",
+							"titanic_df = pd.read_csv('abfss://ex2/titanik.csv')\r\n",
+							"titanic_df\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"\r\n",
+							"titanic_df['Name'] = titanic_df['Name'].str.replace(r'^(Mr\\.|Mrs\\.|Miss\\.)\\s*', '', regex=True)\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"titanic_df"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"average_fare = titanic_df['Fare'].mean()\r\n",
+							"print(average_fare)"
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"titanic_df['highFare']= (titanic_df['Fare'] >= average_fare).astype(int)\r\n",
+							"titanic_df"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"titanic_df.to_csv(\"abfss://ex2@pyryjarvi.dfs.core.windows.net/titaanikki.csv\")"
+						],
+						"outputs": [],
+						"execution_count": 9
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Notebook 3')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "pyrykipina",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "a6bb5c9f-47fd-481a-a3f7-b9f189decc2b"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/23b183d5-a30f-46b8-b418-ad060fb67787/resourceGroups/pyry_resource/providers/Microsoft.Synapse/workspaces/pyrysynapsi/bigDataPools/pyrykipina",
+						"name": "pyrykipina",
+						"type": "Spark",
+						"endpoint": "https://pyrysynapsi.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/pyrykipina",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"jdbc_url = \"jdbc:sqlserver://Uima_allas.database.windows.net:1433;database=dbo;\"\r\n",
+							"spark_read = spark.read.jdbc(url=jdbc_url, table='survivors')\r\n",
+							"spark_read.show(5, truncate=False)"
+						],
+						"outputs": [],
+						"execution_count": 7
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/reseptivihko')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "pyrykipina",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "f8f0aa14-9fae-4f3e-97b7-2375709c8d56"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/23b183d5-a30f-46b8-b418-ad060fb67787/resourceGroups/pyry_resource/providers/Microsoft.Synapse/workspaces/pyrysynapsi/bigDataPools/pyrykipina",
+						"name": "pyrykipina",
+						"type": "Spark",
+						"endpoint": "https://pyrysynapsi.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/pyrykipina",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"import pandas as pd\r\n",
+							"\r\n",
+							"# Path to your JSON files in Azure Data Lake\r\n",
+							"json_path = \"abfss://reseptit@pyryjarvi.dfs.core.windows.net/*.json\"\r\n",
+							"\r\n",
+							"# Step 1: Read JSON files into Spark DataFrame\r\n",
+							"spark_df = spark.read.json(json_path)\r\n",
+							"\r\n",
+							"spark_df\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df_panda = spark_df.select('name',\r\n",
+							"'prepTimeMinutes', 'cookTimeMinutes', 'servings', 'difficulty', 'caloriesPerServing')\r\n",
+							"\r\n",
+							"print(df_panda)"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df_panda.show()"
+						],
+						"outputs": [],
+						"execution_count": 11
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df_pandas = df_panda.toPandas()\r\n",
+							"\r\n",
+							"df_pandas"
+						],
+						"outputs": [],
+						"execution_count": 12
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/pyrykipina')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"autoPause": {
+					"enabled": true,
+					"delayInMinutes": 30
+				},
+				"autoScale": {
+					"enabled": true,
+					"maxNodeCount": 10,
+					"minNodeCount": 3
+				},
+				"nodeCount": 10,
+				"nodeSize": "Small",
+				"nodeSizeFamily": "MemoryOptimized",
+				"sparkVersion": "3.4",
+				"isComputeIsolationEnabled": false,
+				"sessionLevelPackagesEnabled": false,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "northeurope"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Uima_allas')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "northeurope"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/9_12_ex1')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Titanic validation",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Dataflow2",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {},
+									"sink2": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
+				"[concat(variables('workspaceId'), '/dataflows/Dataflow2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Dataflow2')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "titaanikki",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DelimitedText2",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						},
+						{
+							"dataset": {
+								"referenceName": "DelimitedText2",
+								"type": "DatasetReference"
+							},
+							"name": "sink2"
+						}
+					],
+					"transformations": [
+						{
+							"name": "assert1"
+						},
+						{
+							"name": "split1"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "select2"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Prop_0 as string,",
+						"          Survived as string,",
+						"          Pclass as string,",
+						"          Name as string,",
+						"          Sex as string,",
+						"          Age as string,",
+						"          {Siblings/Spouses Aboard} as string,",
+						"          {Parents/Children Aboard} as string,",
+						"          Fare as float,",
+						"          highFare as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"source1 assert(expectUnique(Name, false, 'assert1'),",
+						"     expectTrue(Fare > 0.0, false, 'assert2')) ~> assert1",
+						"assert1 split(isError(),",
+						"     disjoint: false) ~> split1@(Fail, Success)",
+						"split1@Fail select(mapColumn(",
+						"          Survived,",
+						"          Pclass,",
+						"          Name,",
+						"          Sex,",
+						"          Age,",
+						"          Fare",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"split1@Success select(mapColumn(",
+						"          Survived,",
+						"          Pclass,",
+						"          Name,",
+						"          Sex,",
+						"          Age,",
+						"          {Siblings/SpousesAboard} = {Siblings/Spouses Aboard},",
+						"          {Parents/ChildrenAboard} = {Parents/Children Aboard},",
+						"          Fare,",
+						"          highFare",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1",
+						"select2 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink2"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/titaanikki')]",
+				"[concat(variables('workspaceId'), '/datasets/DelimitedText2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureBlobStorage1')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage1_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DelimitedText2')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "titanix"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		}
+	]
+}
