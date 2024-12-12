@@ -1,0 +1,20 @@
+{
+	"name": "vitunhappy",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage2",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "happy/part-00000-tid-2694571529953814670-b7069439-82b3-4e82-ab35-614ee298ee20-56-1-c000.json",
+				"folderPath": "happy",
+				"container": "data"
+			}
+		},
+		"schema": {}
+	}
+}
